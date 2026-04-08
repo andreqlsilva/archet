@@ -22,7 +22,12 @@ Zero runtime dependencies. 100% native DOM and vanilla JavaScript.
 
 ## File Structure
 
-    src/              Component source files (one per component)
+    src/
+      core.js         Component, Root, Box, Row
+      layout.js       Split, Grid
+      content.js      Text, Link, Image
+      form.js         Button, Input
+      composite.js    Deck, Crud
     scripts/          Shell scripts paired with backend-capable components
     test/
       harness.js      Shared vanilla test harness
@@ -34,6 +39,13 @@ Zero runtime dependencies. 100% native DOM and vanilla JavaScript.
     index.html        Live demo
     CLAUDE.md
     README.md
+
+## Coding Rules
+
+- Imports in `src/` files must always be single-line:
+  `import { Component } from './core.js';` — never multi-line.
+  `build.sh` strips imports with `grep -v '^import'`; multi-line imports
+  would leave broken syntax in the built output.
 
 ## TDD Workflow
 
