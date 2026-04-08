@@ -215,6 +215,15 @@ export class Button extends Component {
       border:"1px solid #ccc", background:"#eee", color:"inherit", fontSize: "inherit"
     }).pad(10).round(4);
   }
+
+  flashSuccess(duration=1500) {
+    this.dom.classList.add("feedback-success");
+    setTimeout(() => this.dom.classList.remove("feedback-success"), duration);
+  }
+  flashError(duration=1500) {
+    this.dom.classList.add("feedback-error");
+    setTimeout(() => this.dom.classList.remove("feedback-error"), duration);
+  }
 }
 
 // --- 10. INPUT ---
@@ -290,6 +299,21 @@ export class Select extends Component {
   set val(v) {
     if (Array.from(this.dom.options).some(o => o.value === v)) this.dom.value = v;
   }
+
+  addOption(value, label) {
+    const opt = document.createElement("option");
+    opt.value = value; opt.textContent = label;
+    this.dom.appendChild(opt);
+  }
+  removeOption(value) {
+    const opt = Array.from(this.dom.options).find(o => o.value === value);
+    if (opt) this.dom.removeChild(opt);
+  }
+  updateOption(value, label) {
+    const opt = Array.from(this.dom.options).find(o => o.value === value);
+    if (opt) opt.textContent = label;
+  }
+  clearOptions() { this.dom.innerHTML = ""; }
 }
 
 // --- 11. DECK ---
@@ -395,7 +419,80 @@ export class Tabber extends Component {
   }
 }
 
-// --- 14. CRUD ---
+// --- 14. NAVPAGER ---
+export class NavPager extends Component {
+  constructor() {
+    super("div");
+    this.css({ display:"flex", height:"100%" });
+    this._pages = [];
+
+    this.addBtn = new Button("+");
+    this.nav = new Component("nav");
+    this.nav.css({ display:"flex", flexDirection:"column", gap:"4px", padding:"10px", borderRight:"1px solid #ccc", minWidth:"120px" });
+    this.nav.add(this.addBtn);
+
+    this.content = new Box();
+    this.content.css({ flex:"1", overflow:"auto" });
+
+    super.add(this.nav);
+    super.add(this.content);
+  }
+
+  add(component, onDelete) {
+    const entry = new Component("div");
+    entry.attr("data-role", "nav-entry");
+    entry.css({ display:"flex", alignItems:"center", justifyContent:"space-between", gap:"4px" });
+
+    const label = new Component("span");
+    label.css({ flex:"1", cursor:"pointer", padding:"4px 6px" });
+
+    const del = new Component("button").add("×");
+    del.attr("data-role", "nav-delete");
+    del.css({ background:"none", border:"none", cursor:"pointer", color:"inherit", fontSize:"inherit", padding:"2px 6px" });
+
+    entry.add(label);
+    entry.add(del);
+    this.nav.add(entry);
+
+    const page = { component, entry, label, del, onDelete };
+    this._pages.push(page);
+
+    entry.on("click", (e) => { if (!e.target.closest("[data-role='nav-delete']")) this._show(this._pages.indexOf(page)); });
+    del.on("click", () => { if (page.onDelete) page.onDelete(); this._remove(this._pages.indexOf(page)); });
+
+    this._renumber();
+    this._show(this._pages.length - 1);
+    return this;
+  }
+
+  _renumber() {
+    this._pages.forEach(({ label }, i) => { label.dom.textContent = String(i + 1); });
+  }
+
+  _show(i) {
+    if (i < 0 || i >= this._pages.length) return;
+    this._idx = i;
+    this.content.dom.innerHTML = "";
+    this.content.dom.appendChild(this._pages[i].component.dom);
+  }
+
+  _remove(i) {
+    if (i < 0 || i >= this._pages.length) return;
+    this._pages[i].entry.dom.remove();
+    this._pages.splice(i, 1);
+    this._renumber();
+    this.content.dom.innerHTML = "";
+    if (this._pages.length > 0) this._show(0);
+  }
+
+  empty() {
+    this._pages.forEach(({ entry }) => entry.dom.remove());
+    this._pages = [];
+    this.content.dom.innerHTML = "";
+  }
+}
+
+// --- 15. CRUD ---
 export class Crud extends Box {
   constructor(title, schema=[]) {
     super();

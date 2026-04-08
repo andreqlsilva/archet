@@ -14,6 +14,15 @@ export class Button extends Component {
       border:"1px solid #ccc", background:"#eee", color:"inherit", fontSize: "inherit"
     }).pad(10).round(4);
   }
+
+  flashSuccess(duration=1500) {
+    this.dom.classList.add("feedback-success");
+    setTimeout(() => this.dom.classList.remove("feedback-success"), duration);
+  }
+  flashError(duration=1500) {
+    this.dom.classList.add("feedback-error");
+    setTimeout(() => this.dom.classList.remove("feedback-error"), duration);
+  }
 }
 
 // --- 10. INPUT ---
@@ -89,4 +98,19 @@ export class Select extends Component {
   set val(v) {
     if (Array.from(this.dom.options).some(o => o.value === v)) this.dom.value = v;
   }
+
+  addOption(value, label) {
+    const opt = document.createElement("option");
+    opt.value = value; opt.textContent = label;
+    this.dom.appendChild(opt);
+  }
+  removeOption(value) {
+    const opt = Array.from(this.dom.options).find(o => o.value === value);
+    if (opt) this.dom.removeChild(opt);
+  }
+  updateOption(value, label) {
+    const opt = Array.from(this.dom.options).find(o => o.value === value);
+    if (opt) opt.textContent = label;
+  }
+  clearOptions() { this.dom.innerHTML = ""; }
 }

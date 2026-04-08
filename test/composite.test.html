@@ -22,7 +22,7 @@
 
 <script type="module">
   import { describe, test, expect, runTests } from './harness.js';
-  import { Component, Box, Deck, Crud, Pager, Tabber } from '../archet.js';
+  import { Component, Box, Deck, Crud, Pager, Tabber, NavPager } from '../archet.js';
 
   describe("Deck", () => {
     test("Rejects raw DOM nodes — only Archet Components allowed", () => {
@@ -177,6 +177,78 @@
       const tabs = tabber.strip.dom.querySelectorAll("[data-role='tab']");
       tabs[1].click();
       expect(tabber.content.dom.contains(b.dom)).toBeTruthy();
+    });
+  });
+
+  describe("NavPager", () => {
+    test("Starts empty — no nav entries", () => {
+      const pager = new NavPager();
+      expect(pager.nav.dom.querySelectorAll("[data-role='nav-entry']").length).toBe(0);
+    });
+
+    test("add() shows the new page in the content area", () => {
+      const pager = new NavPager();
+      document.getElementById("stage").appendChild(pager.dom);
+      const box = new Box();
+      pager.add(box);
+      expect(pager.content.dom.contains(box.dom)).toBeTruthy();
+    });
+
+    test("add() creates a numbered nav entry per page", () => {
+      const pager = new NavPager();
+      pager.add(new Box());
+      pager.add(new Box());
+      expect(pager.nav.dom.querySelectorAll("[data-role='nav-entry']").length).toBe(2);
+    });
+
+    test("Each nav entry has a delete button", () => {
+      const pager = new NavPager();
+      pager.add(new Box());
+      expect(pager.nav.dom.querySelector("[data-role='nav-delete']")).toBeTruthy();
+    });
+
+    test("Clicking delete removes the entry and its page", () => {
+      const pager = new NavPager();
+      document.getElementById("stage").appendChild(pager.dom);
+      pager.add(new Box());
+      pager.add(new Box());
+      pager.nav.dom.querySelectorAll("[data-role='nav-delete']")[0].click();
+      expect(pager.nav.dom.querySelectorAll("[data-role='nav-entry']").length).toBe(1);
+    });
+
+    test("delete callback fires when entry is deleted", () => {
+      const pager = new NavPager();
+      document.getElementById("stage").appendChild(pager.dom);
+      let called = false;
+      pager.add(new Box(), () => { called = true; });
+      pager.nav.dom.querySelector("[data-role='nav-delete']").click();
+      expect(called).toBeTruthy();
+    });
+
+    test("Clicking a nav entry switches the visible page", () => {
+      const pager = new NavPager();
+      document.getElementById("stage").appendChild(pager.dom);
+      const a = new Box();
+      const b = new Box();
+      pager.add(a);
+      pager.add(b);
+      pager.nav.dom.querySelectorAll("[data-role='nav-entry']")[0].click();
+      expect(pager.content.dom.contains(a.dom)).toBeTruthy();
+      expect(pager.content.dom.contains(b.dom)).toBe(false);
+    });
+
+    test("empty() removes all entries and clears content", () => {
+      const pager = new NavPager();
+      pager.add(new Box());
+      pager.add(new Box());
+      pager.empty();
+      expect(pager.nav.dom.querySelectorAll("[data-role='nav-entry']").length).toBe(0);
+      expect(pager.content.dom.children.length).toBe(0);
+    });
+
+    test("exposes an addBtn", () => {
+      const pager = new NavPager();
+      expect(typeof pager.addBtn.dom).toBe("object");
     });
   });
 

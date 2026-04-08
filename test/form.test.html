@@ -165,6 +165,55 @@
     });
   });
 
+  describe("Select — dynamic options", () => {
+    test("addOption() appends a new option", () => {
+      const sel = new Select([]);
+      sel.addOption("a", "Alpha");
+      expect(sel.dom.options.length).toBe(1);
+      expect(sel.dom.options[0].value).toBe("a");
+      expect(sel.dom.options[0].textContent).toBe("Alpha");
+    });
+
+    test("removeOption() removes an option by value", () => {
+      const sel = new Select([["a", "Alpha"], ["b", "Beta"]]);
+      sel.removeOption("a");
+      expect(sel.dom.options.length).toBe(1);
+      expect(sel.dom.options[0].value).toBe("b");
+    });
+
+    test("updateOption() changes the label of an option", () => {
+      const sel = new Select([["a", "Alpha"]]);
+      sel.updateOption("a", "Renamed");
+      expect(sel.dom.options[0].textContent).toBe("Renamed");
+    });
+
+    test("clearOptions() removes all options", () => {
+      const sel = new Select([["a", "Alpha"], ["b", "Beta"]]);
+      sel.clearOptions();
+      expect(sel.dom.options.length).toBe(0);
+    });
+  });
+
+  describe("Button — flash feedback", () => {
+    test("flashSuccess() adds then removes feedback-success class", async () => {
+      const btn = new Button("Save");
+      document.getElementById("stage").appendChild(btn.dom);
+      btn.flashSuccess(50);
+      expect(btn.dom.classList.contains("feedback-success")).toBeTruthy();
+      await new Promise(r => setTimeout(r, 100));
+      expect(btn.dom.classList.contains("feedback-success")).toBe(false);
+    });
+
+    test("flashError() adds then removes feedback-error class", async () => {
+      const btn = new Button("Save");
+      document.getElementById("stage").appendChild(btn.dom);
+      btn.flashError(50);
+      expect(btn.dom.classList.contains("feedback-error")).toBeTruthy();
+      await new Promise(r => setTimeout(r, 100));
+      expect(btn.dom.classList.contains("feedback-error")).toBe(false);
+    });
+  });
+
   describe("FilePicker", () => {
     test("Renders an <input type='file'>", () => {
       const fp = new FilePicker();
