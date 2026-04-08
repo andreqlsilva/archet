@@ -22,7 +22,7 @@
 
 <script type="module">
   import { describe, test, expect, runTests } from './harness.js';
-  import { Input, Button } from '../archet.js';
+  import { Input, Button, Select, Checkbox } from '../archet.js';
 
   describe("Input", () => {
     test("Generates deterministic sequential IDs", () => {
@@ -46,6 +46,122 @@
       const inp = new Input("ph", 1, "Label");
       inp.val = "hello";
       expect(inp.val).toBe("hello");
+    });
+  });
+
+  describe("Input — number type", () => {
+    test("Renders an <input type='number'>", () => {
+      const n = new Input("0", 1, null, "number");
+      expect(n.dom.tagName).toBe("INPUT");
+      expect(n.dom.type).toBe("number");
+    });
+
+    test("val getter returns a Number, not a string", () => {
+      const n = new Input("0", 1, null, "number");
+      document.getElementById("stage").appendChild(n.dom);
+      n.val = 42;
+      expect(typeof n.val).toBe("number");
+      expect(n.val).toBe(42);
+    });
+
+    test("val setter accepts numeric values", () => {
+      const n = new Input("0", 1, null, "number");
+      n.val = 7;
+      expect(n.val).toBe(7);
+    });
+  });
+
+  describe("Input — date type", () => {
+    test("Renders an <input type='date'>", () => {
+      const d = new Input("", 1, null, "date");
+      expect(d.dom.tagName).toBe("INPUT");
+      expect(d.dom.type).toBe("date");
+    });
+
+    test("val getter/setter works with ISO date strings", () => {
+      const d = new Input("", 1, null, "date");
+      document.getElementById("stage").appendChild(d.dom);
+      d.val = "2024-06-15";
+      expect(d.val).toBe("2024-06-15");
+    });
+  });
+
+  describe("Checkbox", () => {
+    test("Renders an <input type='checkbox'>", () => {
+      const cb = new Checkbox();
+      expect(cb.dom.tagName).toBe("INPUT");
+      expect(cb.dom.type).toBe("checkbox");
+    });
+
+    test("val is false by default", () => {
+      const cb = new Checkbox();
+      expect(cb.val).toBe(false);
+    });
+
+    test("val setter accepts booleans", () => {
+      const cb = new Checkbox();
+      cb.val = true;
+      expect(cb.val).toBe(true);
+      cb.val = false;
+      expect(cb.val).toBe(false);
+    });
+
+    test("val setter ignores non-booleans", () => {
+      const cb = new Checkbox();
+      cb.val = "yes";
+      expect(cb.val).toBe(false); // unchanged
+    });
+  });
+
+  describe("Select", () => {
+    test("Renders a <select> element", () => {
+      const sel = new Select([["1", "One"], ["2", "Two"]]);
+      expect(sel.dom.tagName).toBe("SELECT");
+    });
+
+    test("Populates options with correct values and labels", () => {
+      const sel = new Select([["a", "Alpha"], ["b", "Beta"], ["c", "Gamma"]]);
+      expect(sel.dom.options.length).toBe(3);
+      expect(sel.dom.options[0].value).toBe("a");
+      expect(sel.dom.options[0].textContent).toBe("Alpha");
+      expect(sel.dom.options[2].value).toBe("c");
+      expect(sel.dom.options[2].textContent).toBe("Gamma");
+    });
+
+    test("Options render in the order given", () => {
+      const sel = new Select([["2", "Two"], ["1", "One"], ["3", "Three"]]);
+      expect(sel.dom.options[0].value).toBe("2");
+      expect(sel.dom.options[1].value).toBe("1");
+      expect(sel.dom.options[2].value).toBe("3");
+    });
+
+    test("val getter returns the first option's value by default", () => {
+      const sel = new Select([["x", "Ex"], ["y", "Why"]]);
+      expect(sel.val).toBe("x");
+    });
+
+    test("val setter changes the selected option", () => {
+      const sel = new Select([["a", "Alpha"], ["b", "Beta"]]);
+      sel.val = "b";
+      expect(sel.val).toBe("b");
+    });
+
+    test("val setter ignores values not in the options", () => {
+      const sel = new Select([["a", "Alpha"], ["b", "Beta"]]);
+      sel.val = "z";
+      expect(sel.val).toBe("a"); // unchanged
+    });
+
+    test("Blank option first — val is empty string by default", () => {
+      const sel = new Select([["", ""], ["1", "One"], ["2", "Two"]]);
+      expect(sel.dom.options.length).toBe(3);
+      expect(sel.val).toBe("");
+    });
+
+    test("Blank option last — first real option is selected by default", () => {
+      const sel = new Select([["1", "One"], ["2", "Two"], ["", ""]]);
+      expect(sel.val).toBe("1");
+      expect(sel.dom.options[2].value).toBe("");
     });
   });
 

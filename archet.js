@@ -221,7 +221,7 @@ export class Button extends Component {
 export class Input extends Component {
   static uid = 0;
 
-  constructor(ph="", lines=1, label=null) {
+  constructor(ph="", lines=1, label=null, type="text") {
     if (label) {
       super("div");
       const id = `inp-${Input.uid++}`;
@@ -230,7 +230,7 @@ export class Input extends Component {
       const lbl = new Component("label").attr("for", id).add(label);
       lbl.css({ fontSize:"0.85rem", fontWeight:"bold", display:"block" });
 
-      this.input = new Input(ph, lines);
+      this.input = new Input(ph, lines, null, type);
       this.input.id(id);
       this.add(lbl, this.input);
       return;
@@ -241,11 +241,44 @@ export class Input extends Component {
     this.css({ width:"100%", fontFamily:"inherit", resize:"vertical" }).pad(8).bd(1).round(4);
 
     if (lines > 1) this.attr("rows", lines);
-    else this.attr("type", "text");
+    else this.attr("type", type);
   }
 
-  get val() { return this.input ? this.input.dom.value : this.dom.value; }
+  get val() {
+    if (this.input) return this.input.val;
+    return this.dom.type === "number" ? Number(this.dom.value) : this.dom.value;
+  }
   set val(v) { if (this.input) this.input.dom.value = v; else this.dom.value = v; }
+}
+
+// --- 11. CHECKBOX ---
+export class Checkbox extends Component {
+  constructor() {
+    super("input");
+    this.attr("type", "checkbox");
+  }
+
+  get val() { return this.dom.checked; }
+  set val(v) { if (typeof v === "boolean") this.dom.checked = v; }
+}
+
+// --- 12. SELECT ---
+export class Select extends Component {
+  constructor(options=[]) {
+    super("select");
+    this.css({ width:"100%", fontFamily:"inherit" }).pad(8).bd(1).round(4);
+    options.forEach(([value, label]) => {
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = label;
+      this.dom.appendChild(opt);
+    });
+  }
+
+  get val() { return this.dom.value; }
+  set val(v) {
+    if (Array.from(this.dom.options).some(o => o.value === v)) this.dom.value = v;
+  }
 }
 
 // --- 11. DECK ---
