@@ -26,7 +26,7 @@ Zero runtime dependencies. 100% native DOM and vanilla JavaScript.
       core.js         Component, Root, Box, Row
       layout.js       Split, Grid
       content.js      Text, Link, Image
-      form.js         Button, Input
+      form.js         Button, Input, Checkbox, Select
       composite.js    Deck, Crud
     scripts/          Shell scripts paired with backend-capable components
     test/
@@ -50,9 +50,10 @@ Zero runtime dependencies. 100% native DOM and vanilla JavaScript.
 ## TDD Workflow
 
 1. Write a failing test in the relevant `*.test.html` first
-2. Implement the feature in `src/`
-3. Run `build.sh` then verify all tests pass via Playwright
-4. Only commit when all tests are green
+2. Run `bash build.sh && deno run --allow-all run_tests.ts` — confirm it's red
+3. Implement the feature in `src/`
+4. Run `bash build.sh && deno run --allow-all run_tests.ts` — confirm it's green
+5. Only commit when all tests are green
 
 Never implement before the test exists.
 Never commit a failing test.
