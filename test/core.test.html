@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>archet / core</title>
+  <style>
+    body        { font-family: monospace; background: #111; color: #ddd; padding: 20px; margin: 8px; }
+    h1          { border-bottom: 1px solid #333; padding-bottom: 10px; }
+    .group      { margin-top: 16px; font-weight: bold; color: #aaa; border-bottom: 1px solid #333; padding-bottom: 4px; }
+    .pass       { color: #5f5; margin: 4px 0; }
+    .fail       { color: #f55; margin: 4px 0; font-weight: bold; background: rgba(255,0,0,0.1); padding: 5px; }
+    .error-trace{ color: #f88; margin-left: 20px; font-size: 0.9em; white-space: pre-wrap; }
+    #stage      { border: 1px dashed #444; padding: 10px; margin-top: 20px; opacity: 0.5; }
+    #scratch    { display: none; }
+  </style>
+</head>
+<body>
+  <h1>archet / core</h1>
+  <div id="report"></div>
+  <div id="stage"></div>
+  <div id="scratch"></div>
+
+<script type="module">
+  import { describe, test, expect, runTests } from './harness.js';
+  import { Component, Root, Box, Row, Button } from '../archet.js';
+
+  describe("Component", () => {
+    test("Hide/Show restores previous display value", () => {
+      const b = new Box().css({ display: "grid" });
+      document.getElementById("stage").appendChild(b.dom);
+      expect(b.dom.style.display).toBe("grid");
+      b.hide();
+      expect(b.dom.style.display).toBe("none");
+      b.show();
+      expect(b.dom.style.display).toBe("grid");
+    });
+
+    test("Primitives and raw nodes appended, nulls silently dropped", () => {
+      const box = new Box();
+      box.add(new Button("A"), document.createElement("span"), "Text");
+      box.add(null, undefined);
+      document.getElementById("stage").appendChild(box.dom);
+      expect(box.dom.children.length).toBe(3);
+    });
+
+    test("bg() and fg() macros apply correct computed colours", () => {
+      const btn = new Button("X").bg("#ff0000").fg("#00ff00");
+      document.getElementById("stage").appendChild(btn.dom);
+      expect(btn.dom).toHaveBg("#ff0000");
+      expect(btn.dom).toHaveFg("#00ff00");
+    });
+  });
+
+  describe("Root", () => {
+    test("Does not reset body margin when mounted to a non-body target", () => {
+      const before = getComputedStyle(document.body).margin;
+      new Root("stage");
+      expect(getComputedStyle(document.body).margin).toBe(before);
+    });
+
+    test("Injects archet-styles exactly once across multiple instances", () => {
+      new Root("stage");
+      new Root("stage");
+      expect(document.querySelectorAll("#archet-styles").length).toBe(1);
+    });
+  });
+
+  runTests();
+</script>
+</body>
+</html>

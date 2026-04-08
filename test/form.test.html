@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>archet / form</title>
+  <style>
+    body        { font-family: monospace; background: #111; color: #ddd; padding: 20px; margin: 8px; }
+    h1          { border-bottom: 1px solid #333; padding-bottom: 10px; }
+    .group      { margin-top: 16px; font-weight: bold; color: #aaa; border-bottom: 1px solid #333; padding-bottom: 4px; }
+    .pass       { color: #5f5; margin: 4px 0; }
+    .fail       { color: #f55; margin: 4px 0; font-weight: bold; background: rgba(255,0,0,0.1); padding: 5px; }
+    .error-trace{ color: #f88; margin-left: 20px; font-size: 0.9em; white-space: pre-wrap; }
+    #stage      { border: 1px dashed #444; padding: 10px; margin-top: 20px; opacity: 0.5; }
+    #scratch    { display: none; }
+  </style>
+</head>
+<body>
+  <h1>archet / form</h1>
+  <div id="report"></div>
+  <div id="stage"></div>
+  <div id="scratch"></div>
+
+<script type="module">
+  import { describe, test, expect, runTests } from './harness.js';
+  import { Input, Button } from '../archet.js';
+
+  describe("Input", () => {
+    test("Generates deterministic sequential IDs", () => {
+      Input.uid = 0;
+      const inp = new Input("A", 1, "Label A");
+      document.getElementById("stage").appendChild(inp.dom);
+      expect(inp.input.dom.id).toMatch(/^inp-\d+$/);
+      expect(inp.input.dom.id).toBe("inp-0");
+    });
+
+    test("Label click focuses the input", () => {
+      Input.uid = 0;
+      const inp = new Input("A", 1, "Label A");
+      document.getElementById("stage").appendChild(inp.dom);
+      const label = inp.dom.querySelector("label");
+      label.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+      expect(document.activeElement).toBe(inp.input.dom);
+    });
+
+    test("val getter/setter works on labelled input", () => {
+      const inp = new Input("ph", 1, "Label");
+      inp.val = "hello";
+      expect(inp.val).toBe("hello");
+    });
+  });
+
+  runTests();
+</script>
+</body>
+</html>

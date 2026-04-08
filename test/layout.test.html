@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>archet / layout</title>
+  <style>
+    body        { font-family: monospace; background: #111; color: #ddd; padding: 20px; margin: 8px; }
+    h1          { border-bottom: 1px solid #333; padding-bottom: 10px; }
+    .group      { margin-top: 16px; font-weight: bold; color: #aaa; border-bottom: 1px solid #333; padding-bottom: 4px; }
+    .pass       { color: #5f5; margin: 4px 0; }
+    .fail       { color: #f55; margin: 4px 0; font-weight: bold; background: rgba(255,0,0,0.1); padding: 5px; }
+    .error-trace{ color: #f88; margin-left: 20px; font-size: 0.9em; white-space: pre-wrap; }
+    #stage      { border: 1px dashed #444; padding: 10px; margin-top: 20px; opacity: 0.5; }
+    #scratch    { display: none; }
+  </style>
+</head>
+<body>
+  <h1>archet / layout</h1>
+  <div id="report"></div>
+  <div id="stage"></div>
+  <div id="scratch"></div>
+
+<script type="module">
+  import { describe, test, expect, runTests } from './harness.js';
+  import { Component, Split, Grid } from '../archet.js';
+
+  describe("Split", () => {
+    test("Wraps raw DOM nodes in a flex-column div", () => {
+      const split = new Split(50, 50);
+      const raw = document.createElement("div");
+      raw.textContent = "Raw";
+
+      split.add(raw, "Right");
+      document.getElementById("stage").appendChild(split.dom);
+
+      expect(split.dom.children.length).toBe(2);
+
+      const wrapper = split.dom.children[0];
+      expect(wrapper.tagName).toBe("DIV");
+      expect(wrapper.style.flexDirection).toBe("column");
+      expect(wrapper.firstElementChild).toBe(raw);
+    });
+
+    test("Applies flex-grow ratios to children", () => {
+      const split = new Split(50, 50);
+      split.add("Left", "Right");
+      document.getElementById("stage").appendChild(split.dom);
+
+      const left = split.dom.children[0];
+      expect(Number(getComputedStyle(left).flexGrow)).toBe(50);
+      expect(left.textContent).toBe("Left");
+    });
+  });
+
+  runTests();
+</script>
+</body>
+</html>

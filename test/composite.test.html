@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>archet / composite</title>
+  <style>
+    body        { font-family: monospace; background: #111; color: #ddd; padding: 20px; margin: 8px; }
+    h1          { border-bottom: 1px solid #333; padding-bottom: 10px; }
+    .group      { margin-top: 16px; font-weight: bold; color: #aaa; border-bottom: 1px solid #333; padding-bottom: 4px; }
+    .pass       { color: #5f5; margin: 4px 0; }
+    .fail       { color: #f55; margin: 4px 0; font-weight: bold; background: rgba(255,0,0,0.1); padding: 5px; }
+    .error-trace{ color: #f88; margin-left: 20px; font-size: 0.9em; white-space: pre-wrap; }
+    #stage      { border: 1px dashed #444; padding: 10px; margin-top: 20px; opacity: 0.5; }
+    #scratch    { display: none; }
+  </style>
+</head>
+<body>
+  <h1>archet / composite</h1>
+  <div id="report"></div>
+  <div id="stage"></div>
+  <div id="scratch"></div>
+
+<script type="module">
+  import { describe, test, expect, runTests } from './harness.js';
+  import { Component, Box, Deck, Crud } from '../archet.js';
+
+  describe("Deck", () => {
+    test("Rejects raw DOM nodes — only Archet Components allowed", () => {
+      const deck = new Deck();
+      deck.add(new Box());
+      expect(deck.items.length).toBe(1);
+      expect(() => deck.add(document.createElement("div"))).toThrow("Only Archet Components");
+    });
+  });
+
+  describe("Crud", () => {
+    test("Adding an item appends to data and clears inputs", () => {
+      const crud = new Crud("Users", ["Name"]);
+      crud.onError = () => {};
+      document.getElementById("stage").appendChild(crud.dom);
+
+      crud.inputs["Name"].val = "Alice";
+      crud.addItem();
+
+      expect(crud.data.length).toBe(1);
+      expect(crud.inputs["Name"].val).toBe("");
+    });
+
+    test("Delete button removes the correct item", () => {
+      const crud = new Crud("Users", ["Name"]);
+      crud.onError = () => {};
+      document.getElementById("stage").appendChild(crud.dom);
+
+      crud.inputs["Name"].val = "Alice";
+      crud.addItem();
+      expect(crud.data.length).toBe(1);
+
+      const btn = crud.list.dom.querySelector('[data-role="delete"]');
+      expect(btn).toBeTruthy();
+      btn.click();
+      expect(crud.data.length).toBe(0);
+    });
+
+    test("Rejects addItem when a field is empty", () => {
+      let errorCalled = false;
+      const crud = new Crud("Users", ["Name", "Email"]);
+      crud.onError = () => { errorCalled = true; };
+      document.getElementById("stage").appendChild(crud.dom);
+
+      crud.inputs["Name"].val = "Alice";
+      // Email left empty
+      crud.addItem();
+
+      expect(crud.data.length).toBe(0);
+      expect(errorCalled).toBeTruthy();
+    });
+  });
+
+  runTests();
+</script>
+</body>
+</html>
