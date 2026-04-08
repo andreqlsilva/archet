@@ -262,7 +262,18 @@ export class Checkbox extends Component {
   set val(v) { if (typeof v === "boolean") this.dom.checked = v; }
 }
 
-// --- 12. SELECT ---
+// --- 12. FILEPICKER ---
+export class FilePicker extends Component {
+  constructor() {
+    super("input");
+    this.attr("type", "file").attr("accept", ".json");
+  }
+
+  get file() { return this.dom.files[0] ?? null; }
+  trigger() { this.dom.click(); }
+}
+
+// --- 13. SELECT ---
 export class Select extends Component {
   constructor(options=[]) {
     super("select");
@@ -312,7 +323,79 @@ export class Deck extends Component {
   }
 }
 
-// --- 12. CRUD ---
+// --- 12. PAGER ---
+export class Pager extends Component {
+  constructor(pages=[]) {
+    super("div");
+    this.css({ display:"flex", height:"100%" });
+    this._pages = pages;
+
+    this.nav = new Component("nav");
+    this.nav.css({ display:"flex", flexDirection:"column", gap:"4px", padding:"10px", borderRight:"1px solid #ccc", minWidth:"120px" });
+
+    this.content = new Box();
+    this.content.css({ flex:"1", overflow:"auto" });
+
+    this._links = pages.map(([label], i) => {
+      const link = new Component("button").add(label);
+      link.css({ background:"none", border:"none", textAlign:"left", cursor:"pointer", padding:"6px 10px", borderRadius:"4px", color:"inherit", fontFamily:"inherit", fontSize:"inherit" });
+      link.attr("data-role", "page-link");
+      link.on("click", () => this.select(i));
+      this.nav.add(link);
+      return link;
+    });
+
+    super.add(this.nav);
+    super.add(this.content);
+    this.select(0);
+  }
+
+  select(i) {
+    this._idx = i;
+    this.content.dom.innerHTML = "";
+    this.content.dom.appendChild(this._pages[i][1].dom);
+    this._links.forEach((l, j) => l.css({ background: j === i ? "#ddd" : "none", fontWeight: j === i ? "bold" : "normal" }));
+    return this;
+  }
+}
+
+// --- 13. TABBER ---
+export class Tabber extends Component {
+  constructor(pages=[]) {
+    super("div");
+    this.css({ display:"flex", flexDirection:"column", height:"100%" });
+    this._pages = pages;
+
+    this.strip = new Component("nav");
+    this.strip.css({ display:"flex", gap:"2px", borderBottom:"1px solid #ccc", padding:"0 10px" });
+
+    this.content = new Box();
+    this.content.css({ flex:"1", overflow:"auto" });
+
+    this._tabs = pages.map(([label], i) => {
+      const tab = new Component("button").add(label);
+      tab.css({ background:"none", border:"none", borderBottom:"2px solid transparent", cursor:"pointer", padding:"8px 14px", color:"inherit", fontFamily:"inherit", fontSize:"inherit" });
+      tab.attr("data-role", "tab");
+      tab.on("click", () => this.select(i));
+      this.strip.add(tab);
+      return tab;
+    });
+
+    super.add(this.strip);
+    super.add(this.content);
+    this.select(0);
+  }
+
+  select(i) {
+    this._idx = i;
+    this.content.dom.innerHTML = "";
+    this.content.dom.appendChild(this._pages[i][1].dom);
+    this._tabs.forEach((t, j) => t.css({ borderBottom: j === i ? "2px solid currentColor" : "2px solid transparent", fontWeight: j === i ? "bold" : "normal" }));
+    return this;
+  }
+}
+
+// --- 14. CRUD ---
 export class Crud extends Box {
   constructor(title, schema=[]) {
     super();

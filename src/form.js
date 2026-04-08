@@ -61,7 +61,18 @@ export class Checkbox extends Component {
   set val(v) { if (typeof v === "boolean") this.dom.checked = v; }
 }
 
-// --- 12. SELECT ---
+// --- 12. FILEPICKER ---
+export class FilePicker extends Component {
+  constructor() {
+    super("input");
+    this.attr("type", "file").attr("accept", ".json");
+  }
+
+  get file() { return this.dom.files[0] ?? null; }
+  trigger() { this.dom.click(); }
+}
+
+// --- 13. SELECT ---
 export class Select extends Component {
   constructor(options=[]) {
     super("select");

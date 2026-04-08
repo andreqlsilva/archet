@@ -22,7 +22,7 @@
 
 <script type="module">
   import { describe, test, expect, runTests } from './harness.js';
-  import { Input, Button, Select, Checkbox } from '../archet.js';
+  import { Input, Button, Select, Checkbox, FilePicker } from '../archet.js';
 
   describe("Input", () => {
     test("Generates deterministic sequential IDs", () => {
@@ -162,6 +162,29 @@
       const sel = new Select([["1", "One"], ["2", "Two"], ["", ""]]);
       expect(sel.val).toBe("1");
       expect(sel.dom.options[2].value).toBe("");
+    });
+  });
+
+  describe("FilePicker", () => {
+    test("Renders an <input type='file'>", () => {
+      const fp = new FilePicker();
+      expect(fp.dom.tagName).toBe("INPUT");
+      expect(fp.dom.type).toBe("file");
+    });
+
+    test("Accepts only .json files by default", () => {
+      const fp = new FilePicker();
+      expect(fp.dom.accept).toBe(".json");
+    });
+
+    test("file getter returns null when no file selected", () => {
+      const fp = new FilePicker();
+      expect(fp.file).toBe(null);
+    });
+
+    test("trigger() is a function", () => {
+      const fp = new FilePicker();
+      expect(typeof fp.trigger).toBe("function");
     });
   });
 

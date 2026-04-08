@@ -22,7 +22,7 @@
 
 <script type="module">
   import { describe, test, expect, runTests } from './harness.js';
-  import { Component, Box, Deck, Crud } from '../archet.js';
+  import { Component, Box, Deck, Crud, Pager, Tabber } from '../archet.js';
 
   describe("Deck", () => {
     test("Rejects raw DOM nodes — only Archet Components allowed", () => {
@@ -73,6 +73,110 @@
 
       expect(crud.data.length).toBe(0);
       expect(errorCalled).toBeTruthy();
+    });
+  });
+
+  describe("Pager", () => {
+    test("Renders a container with a nav and a content pane", () => {
+      const pager = new Pager([
+        ["Home", new Box()],
+        ["About", new Box()],
+      ]);
+      document.getElementById("stage").appendChild(pager.dom);
+      expect(pager.nav.dom.tagName).toBe("NAV");
+      expect(pager.content.dom).toBeTruthy();
+    });
+
+    test("Nav has one entry per page", () => {
+      const pager = new Pager([
+        ["Home", new Box()],
+        ["About", new Box()],
+        ["Contact", new Box()],
+      ]);
+      document.getElementById("stage").appendChild(pager.dom);
+      const items = pager.nav.dom.querySelectorAll("[data-role='page-link']");
+      expect(items.length).toBe(3);
+    });
+
+    test("First page is shown by default", () => {
+      const a = new Box();
+      const b = new Box();
+      const pager = new Pager([["A", a], ["B", b]]);
+      document.getElementById("stage").appendChild(pager.dom);
+      expect(pager.content.dom.contains(a.dom)).toBeTruthy();
+      expect(pager.content.dom.contains(b.dom)).toBe(false);
+    });
+
+    test("select(index) switches the visible page", () => {
+      const a = new Box();
+      const b = new Box();
+      const pager = new Pager([["A", a], ["B", b]]);
+      document.getElementById("stage").appendChild(pager.dom);
+      pager.select(1);
+      expect(pager.content.dom.contains(b.dom)).toBeTruthy();
+      expect(pager.content.dom.contains(a.dom)).toBe(false);
+    });
+
+    test("Clicking a nav link switches the page", () => {
+      const a = new Box();
+      const b = new Box();
+      const pager = new Pager([["A", a], ["B", b]]);
+      document.getElementById("stage").appendChild(pager.dom);
+      const links = pager.nav.dom.querySelectorAll("[data-role='page-link']");
+      links[1].click();
+      expect(pager.content.dom.contains(b.dom)).toBeTruthy();
+    });
+  });
+
+  describe("Tabber", () => {
+    test("Renders a container with a tab strip and a content pane", () => {
+      const tabber = new Tabber([
+        ["One", new Box()],
+        ["Two", new Box()],
+      ]);
+      document.getElementById("stage").appendChild(tabber.dom);
+      expect(tabber.strip.dom.tagName).toBe("NAV");
+      expect(tabber.content.dom).toBeTruthy();
+    });
+
+    test("Strip has one tab per page", () => {
+      const tabber = new Tabber([
+        ["One", new Box()],
+        ["Two", new Box()],
+        ["Three", new Box()],
+      ]);
+      document.getElementById("stage").appendChild(tabber.dom);
+      const tabs = tabber.strip.dom.querySelectorAll("[data-role='tab']");
+      expect(tabs.length).toBe(3);
+    });
+
+    test("First tab is active by default", () => {
+      const a = new Box();
+      const b = new Box();
+      const tabber = new Tabber([["A", a], ["B", b]]);
+      document.getElementById("stage").appendChild(tabber.dom);
+      expect(tabber.content.dom.contains(a.dom)).toBeTruthy();
+      expect(tabber.content.dom.contains(b.dom)).toBe(false);
+    });
+
+    test("select(index) switches the visible panel", () => {
+      const a = new Box();
+      const b = new Box();
+      const tabber = new Tabber([["A", a], ["B", b]]);
+      document.getElementById("stage").appendChild(tabber.dom);
+      tabber.select(1);
+      expect(tabber.content.dom.contains(b.dom)).toBeTruthy();
+      expect(tabber.content.dom.contains(a.dom)).toBe(false);
+    });
+
+    test("Clicking a tab switches the panel", () => {
+      const a = new Box();
+      const b = new Box();
+      const tabber = new Tabber([["A", a], ["B", b]]);
+      document.getElementById("stage").appendChild(tabber.dom);
+      const tabs = tabber.strip.dom.querySelectorAll("[data-role='tab']");
+      tabs[1].click();
+      expect(tabber.content.dom.contains(b.dom)).toBeTruthy();
     });
   });
 
