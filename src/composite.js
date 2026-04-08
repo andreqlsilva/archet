@@ -6,6 +6,7 @@ import { Input, Button } from './form.js';
 export class Deck extends Component {
   constructor() {
     super("div");
+    this.cls("archet-deck");
     this.items = []; this.idx = 0;
     this.size(100, 100).css({ display:"flex", flexDirection:"column" });
   }
@@ -37,6 +38,7 @@ export class Deck extends Component {
 export class Pager extends Component {
   constructor(pages=[]) {
     super("div");
+    this.cls("archet-pager");
     this.css({ display:"flex", height:"100%" });
     this._pages = pages;
 
@@ -73,6 +75,7 @@ export class Pager extends Component {
 export class Tabber extends Component {
   constructor(pages=[]) {
     super("div");
+    this.cls("archet-tabber");
     this.css({ display:"flex", flexDirection:"column", height:"100%" });
     this._pages = pages;
 
@@ -109,6 +112,7 @@ export class Tabber extends Component {
 export class NavPager extends Component {
   constructor() {
     super("div");
+    this.cls("archet-navpager");
     this.css({ display:"flex", height:"100%" });
     this._pages = [];
 
@@ -182,6 +186,7 @@ export class NavPager extends Component {
 export class Crud extends Box {
   constructor(title, schema=[]) {
     super();
+    this.cls("archet-crud");
     this.schema = schema; this.data = [];
     this.onError = alert;
 

@@ -24,6 +24,16 @@
   import { describe, test, expect, runTests } from './harness.js';
   import { Component, Split, Grid } from '../archet.js';
 
+
+  describe("Semantic CSS classes", () => {
+    test("Split has archet-split class", () => {
+      expect(new Split(50, 50).dom.classList.contains("archet-split")).toBeTruthy();
+    });
+    test("Grid has archet-grid class", () => {
+      expect(new Grid(3).dom.classList.contains("archet-grid")).toBeTruthy();
+    });
+  });
+
   describe("Split", () => {
     test("Wraps raw DOM nodes in a flex-column div", () => {
       const split = new Split(50, 50);

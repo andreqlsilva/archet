@@ -24,6 +24,24 @@
   import { describe, test, expect, runTests } from './harness.js';
   import { Component, Box, Deck, Crud, Pager, Tabber, NavPager } from '../archet.js';
 
+  describe("Semantic CSS classes", () => {
+    test("Pager has archet-pager class", () => {
+      expect(new Pager([["A", new Box()]]).dom.classList.contains("archet-pager")).toBeTruthy();
+    });
+    test("Tabber has archet-tabber class", () => {
+      expect(new Tabber([["A", new Box()]]).dom.classList.contains("archet-tabber")).toBeTruthy();
+    });
+    test("NavPager has archet-navpager class", () => {
+      expect(new NavPager().dom.classList.contains("archet-navpager")).toBeTruthy();
+    });
+    test("Deck has archet-deck class", () => {
+      expect(new Deck().dom.classList.contains("archet-deck")).toBeTruthy();
+    });
+    test("Crud has archet-crud class", () => {
+      expect(new Crud("Items", ["Name"]).dom.classList.contains("archet-crud")).toBeTruthy();
+    });
+  });
+
   describe("Deck", () => {
     test("Rejects raw DOM nodes — only Archet Components allowed", () => {
       const deck = new Deck();

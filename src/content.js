@@ -4,6 +4,7 @@ import { Component } from './core.js';
 export class Text extends Component {
   constructor(txt) {
     super("span");
+    this.cls("archet-text");
     this.dom.textContent = String(txt);
     this.css({ display:"inline-block" });
   }

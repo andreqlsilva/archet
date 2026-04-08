@@ -22,7 +22,7 @@
 
 <script type="module">
   import { describe, test, expect, runTests } from './harness.js';
-  import { Component, Root, Box, Row, Button } from '../archet.js';
+  import { Component, Root, Box, Row, Text, Button } from '../archet.js';
 
   describe("Component", () => {
     test("Hide/Show restores previous display value", () => {
@@ -48,6 +48,24 @@
       document.getElementById("stage").appendChild(btn.dom);
       expect(btn.dom).toHaveBg("#ff0000");
       expect(btn.dom).toHaveFg("#00ff00");
+    });
+  });
+
+  describe("Semantic CSS classes", () => {
+    test("Box has archet-box class", () => {
+      expect(new Box().dom.classList.contains("archet-box")).toBeTruthy();
+    });
+    test("Row has archet-row class", () => {
+      expect(new Row().dom.classList.contains("archet-row")).toBeTruthy();
+    });
+    test("Text has archet-text class", () => {
+      expect(new Text("hi").dom.classList.contains("archet-text")).toBeTruthy();
+    });
+    test("Button has archet-button class", () => {
+      expect(new Button("x").dom.classList.contains("archet-button")).toBeTruthy();
+    });
+    test("archet-theme stylesheet is auto-injected", () => {
+      expect(document.getElementById("archet-theme")).toBeTruthy();
     });
   });
 

@@ -7,6 +7,7 @@ export class Button extends Component {
     if (typeof content === "string") this.dom.textContent = content;
     else this.add(content);
 
+    this.cls("archet-button");
     if (fn) this.on("click", (e) => { e.preventDefault(); fn(e); });
 
     this.css({
@@ -32,6 +33,7 @@ export class Input extends Component {
   constructor(ph="", lines=1, label=null, type="text") {
     if (label) {
       super("div");
+      this.cls("archet-input");
       const id = `inp-${Input.uid++}`;
       this.css({ display:"flex", flexDirection:"column", gap:"5px", width:"100%" });
 
@@ -45,6 +47,7 @@ export class Input extends Component {
     }
 
     super(lines > 1 ? "textarea" : "input");
+    this.cls("archet-input");
     this.attr("placeholder", ph);
     this.css({ width:"100%", fontFamily:"inherit", resize:"vertical" }).pad(8).bd(1).round(4);
 
@@ -63,6 +66,7 @@ export class Input extends Component {
 export class Checkbox extends Component {
   constructor() {
     super("input");
+    this.cls("archet-checkbox");
     this.attr("type", "checkbox");
   }
 
@@ -74,6 +78,7 @@ export class Checkbox extends Component {
 export class FilePicker extends Component {
   constructor() {
     super("input");
+    this.cls("archet-filepicker");
     this.attr("type", "file").attr("accept", ".json");
   }
 
@@ -85,6 +90,7 @@ export class FilePicker extends Component {
 export class Select extends Component {
   constructor(options=[]) {
     super("select");
+    this.cls("archet-select");
     this.css({ width:"100%", fontFamily:"inherit" }).pad(8).bd(1).round(4);
     options.forEach(([value, label]) => {
       const opt = document.createElement("option");

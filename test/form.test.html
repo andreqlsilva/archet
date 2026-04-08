@@ -165,6 +165,27 @@
     });
   });
 
+  describe("Semantic CSS classes", () => {
+    test("Button has archet-button class", () => {
+      expect(new Button("x").dom.classList.contains("archet-button")).toBeTruthy();
+    });
+    test("Input (no label) has archet-input class", () => {
+      expect(new Input("x").dom.classList.contains("archet-input")).toBeTruthy();
+    });
+    test("Input (with label) has archet-input class", () => {
+      expect(new Input("x", 1, "Label").dom.classList.contains("archet-input")).toBeTruthy();
+    });
+    test("Checkbox has archet-checkbox class", () => {
+      expect(new Checkbox().dom.classList.contains("archet-checkbox")).toBeTruthy();
+    });
+    test("Select has archet-select class", () => {
+      expect(new Select([]).dom.classList.contains("archet-select")).toBeTruthy();
+    });
+    test("FilePicker has archet-filepicker class", () => {
+      expect(new FilePicker().dom.classList.contains("archet-filepicker")).toBeTruthy();
+    });
+  });
+
   describe("Select — dynamic options", () => {
     test("addOption() appends a new option", () => {
       const sel = new Select([]);

@@ -81,6 +81,23 @@ export class Component {
   animate(prop="all", time="0.2s") { return this.css({ transition: `${prop} ${time}` }); }
 }
 
+// --- THEME INJECTION ---
+(function() {
+  if (typeof document === "undefined") return;
+  if (document.getElementById("archet-theme")) return;
+  const s = document.createElement("style");
+  s.id = "archet-theme";
+  s.textContent = `
+    .archet-button { transition: filter 0.15s, transform 0.1s; }
+    .archet-button:hover { filter: brightness(0.9); }
+    .archet-button:active { transform: translateY(1px); }
+    .archet-input input:focus,
+    .archet-input textarea:focus,
+    .archet-select:focus { border-color: #007bff !important; box-shadow: 0 0 0 3px rgba(0,123,255,0.25); }
+  `;
+  document.head.appendChild(s);
+})();
+
 // --- 1. ROOT ---
 export class Root extends Component {
   constructor(targetId) {
@@ -122,6 +139,7 @@ export class Root extends Component {
 export class Box extends Component {
   constructor(w=100, h=100) {
     super("div");
+    this.cls("archet-box");
     this.size(w, h).css({ display:"flex", flexDirection:"column", position:"relative" });
   }
 }
@@ -130,6 +148,7 @@ export class Box extends Component {
 export class Row extends Component {
   constructor(h=null) {
     super("div");
+    this.cls("archet-row");
     this.size(100, h).css({ display:"flex", flexDirection:"row", alignItems:"center" });
   }
 }

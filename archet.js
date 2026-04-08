@@ -81,6 +81,23 @@ export class Component {
   animate(prop="all", time="0.2s") { return this.css({ transition: `${prop} ${time}` }); }
 }
 
+// --- THEME INJECTION ---
+(function() {
+  if (typeof document === "undefined") return;
+  if (document.getElementById("archet-theme")) return;
+  const s = document.createElement("style");
+  s.id = "archet-theme";
+  s.textContent = `
+    .archet-button { transition: filter 0.15s, transform 0.1s; }
+    .archet-button:hover { filter: brightness(0.9); }
+    .archet-button:active { transform: translateY(1px); }
+    .archet-input input:focus,
+    .archet-input textarea:focus,
+    .archet-select:focus { border-color: #007bff !important; box-shadow: 0 0 0 3px rgba(0,123,255,0.25); }
+  `;
+  document.head.appendChild(s);
+})();
+
 // --- 1. ROOT ---
 export class Root extends Component {
   constructor(targetId) {
@@ -122,6 +139,7 @@ export class Root extends Component {
 export class Box extends Component {
   constructor(w=100, h=100) {
     super("div");
+    this.cls("archet-box");
     this.size(w, h).css({ display:"flex", flexDirection:"column", position:"relative" });
   }
 }
@@ -130,6 +148,7 @@ export class Box extends Component {
 export class Row extends Component {
   constructor(h=null) {
     super("div");
+    this.cls("archet-row");
     this.size(100, h).css({ display:"flex", flexDirection:"row", alignItems:"center" });
   }
 }
@@ -138,6 +157,7 @@ export class Row extends Component {
 export class Split extends Component {
   constructor(...ratios) {
     super("div");
+    this.cls("archet-split");
     this.size(100, 100).css({ display:"flex" });
     this.ratios = ratios; this.idx = 0;
   }
@@ -168,6 +188,7 @@ export class Split extends Component {
 export class Grid extends Component {
   constructor(cols=2, gapSize="10px") {
     super("div");
+    this.cls("archet-grid");
     this.css({ display:"grid", gridTemplateColumns:`repeat(${cols}, 1fr)`, gap:gapSize, width:"100%" });
   }
 }
@@ -176,6 +197,7 @@ export class Grid extends Component {
 export class Text extends Component {
   constructor(txt) {
     super("span");
+    this.cls("archet-text");
     this.dom.textContent = String(txt);
     this.css({ display:"inline-block" });
   }
@@ -208,6 +230,7 @@ export class Button extends Component {
     if (typeof content === "string") this.dom.textContent = content;
     else this.add(content);
 
+    this.cls("archet-button");
     if (fn) this.on("click", (e) => { e.preventDefault(); fn(e); });
 
     this.css({
@@ -233,6 +256,7 @@ export class Input extends Component {
   constructor(ph="", lines=1, label=null, type="text") {
     if (label) {
       super("div");
+      this.cls("archet-input");
       const id = `inp-${Input.uid++}`;
       this.css({ display:"flex", flexDirection:"column", gap:"5px", width:"100%" });
 
@@ -246,6 +270,7 @@ export class Input extends Component {
     }
 
     super(lines > 1 ? "textarea" : "input");
+    this.cls("archet-input");
     this.attr("placeholder", ph);
     this.css({ width:"100%", fontFamily:"inherit", resize:"vertical" }).pad(8).bd(1).round(4);
 
@@ -264,6 +289,7 @@ export class Input extends Component {
 export class Checkbox extends Component {
   constructor() {
     super("input");
+    this.cls("archet-checkbox");
     this.attr("type", "checkbox");
   }
 
@@ -275,6 +301,7 @@ export class Checkbox extends Component {
 export class FilePicker extends Component {
   constructor() {
     super("input");
+    this.cls("archet-filepicker");
     this.attr("type", "file").attr("accept", ".json");
   }
 
@@ -286,6 +313,7 @@ export class FilePicker extends Component {
 export class Select extends Component {
   constructor(options=[]) {
     super("select");
+    this.cls("archet-select");
     this.css({ width:"100%", fontFamily:"inherit" }).pad(8).bd(1).round(4);
     options.forEach(([value, label]) => {
       const opt = document.createElement("option");
@@ -320,6 +348,7 @@ export class Select extends Component {
 export class Deck extends Component {
   constructor() {
     super("div");
+    this.cls("archet-deck");
     this.items = []; this.idx = 0;
     this.size(100, 100).css({ display:"flex", flexDirection:"column" });
   }
@@ -351,6 +380,7 @@ export class Deck extends Component {
 export class Pager extends Component {
   constructor(pages=[]) {
     super("div");
+    this.cls("archet-pager");
     this.css({ display:"flex", height:"100%" });
     this._pages = pages;
 
@@ -387,6 +417,7 @@ export class Pager extends Component {
 export class Tabber extends Component {
   constructor(pages=[]) {
     super("div");
+    this.cls("archet-tabber");
     this.css({ display:"flex", flexDirection:"column", height:"100%" });
     this._pages = pages;
 
@@ -423,6 +454,7 @@ export class Tabber extends Component {
 export class NavPager extends Component {
   constructor() {
     super("div");
+    this.cls("archet-navpager");
     this.css({ display:"flex", height:"100%" });
     this._pages = [];
 
@@ -496,6 +528,7 @@ export class NavPager extends Component {
 export class Crud extends Box {
   constructor(title, schema=[]) {
     super();
+    this.cls("archet-crud");
     this.schema = schema; this.data = [];
     this.onError = alert;
 

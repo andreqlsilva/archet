@@ -4,6 +4,7 @@ import { Component } from './core.js';
 export class Split extends Component {
   constructor(...ratios) {
     super("div");
+    this.cls("archet-split");
     this.size(100, 100).css({ display:"flex" });
     this.ratios = ratios; this.idx = 0;
   }
@@ -34,6 +35,7 @@ export class Split extends Component {
 export class Grid extends Component {
   constructor(cols=2, gapSize="10px") {
     super("div");
+    this.cls("archet-grid");
     this.css({ display:"grid", gridTemplateColumns:`repeat(${cols}, 1fr)`, gap:gapSize, width:"100%" });
   }
 }
