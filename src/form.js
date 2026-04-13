@@ -12,7 +12,7 @@ export class Button extends Component {
 
     this.css({
       cursor:"pointer", display:"inline-flex", alignItems:"center", justifyContent:"center", gap:"8px",
-      border:"1px solid #ccc", background:"#eee", color:"inherit", fontSize: "inherit"
+      border:"1px solid var(--archet-border)", background:"var(--archet-surface)", color:"inherit", fontSize: "inherit"
     }).pad(10).round(4);
   }
 
@@ -86,7 +86,43 @@ export class FilePicker extends Component {
   trigger() { this.dom.click(); }
 }
 
-// --- 13. SELECT ---
+// --- 13. FORM ---
+export class Form extends Component {
+  constructor() {
+    super("div");
+    this.cls("archet-form");
+    this.css({ display:"flex", flexDirection:"column", gap:"10px" });
+    this._fields = {};
+  }
+
+  add(name, field) {
+    this._fields[name] = field;
+    super.add(field);
+    return this;
+  }
+
+  remove(name) {
+    if (!this._fields[name]) return this;
+    const field = this._fields[name];
+    const el = field.dom ?? field;
+    el.parentNode?.removeChild(el);
+    delete this._fields[name];
+    return this;
+  }
+
+  values() {
+    const out = {};
+    for (const [name, field] of Object.entries(this._fields)) out[name] = field.val;
+    return out;
+  }
+
+  clear() {
+    for (const field of Object.values(this._fields)) field.val = "";
+    return this;
+  }
+}
+
+// --- 14. SELECT ---
 export class Select extends Component {
   constructor(options=[]) {
     super("select");

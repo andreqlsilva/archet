@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>archet / all tests</title>
+  <link rel="stylesheet" href="./test/test.css">
+</head>
+<body>
+  <h1>archet / all tests</h1>
+  <p><a href="test/core.test.html">core</a> · <a href="test/layout.test.html">layout</a> · <a href="test/content.test.html">content</a> · <a href="test/form.test.html">form</a> · <a href="test/composite.test.html">composite</a> · <a href="test/theme.test.html">theme</a></p>
+  <div id="report"></div>
+  <div id="stage"></div>
+  <div id="scratch"></div>
+  <script type="module">
+    import { runTests } from './test.js';
+    import './test/core.tests.js';
+    import './test/layout.tests.js';
+    import './test/content.tests.js';
+    import './test/form.tests.js';
+    import './test/composite.tests.js';
+    import './test/theme.tests.js';
+    runTests();
+  </script>
+</body>
+</html>

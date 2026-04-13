@@ -1,0 +1,13 @@
+body        { font-family: monospace; background: var(--archet-bg, #111); color: var(--archet-fg, #ddd); padding: 20px; margin: 8px; }
+a           { color: var(--archet-link, #4da6ff); }
+h1          { border-bottom: 1px solid var(--archet-border, #555); padding-bottom: 10px; }
+#summary    { margin-bottom: 16px; }
+.group      { margin-top: 16px; font-weight: bold; color: var(--archet-muted, #aaa); border-bottom: 1px solid var(--archet-border, #555); padding-bottom: 4px; }
+.pass       { color: #5f5; margin: 4px 0; }
+.fail       { color: #f55; margin: 4px 0; font-weight: bold; background: rgba(255,0,0,0.1); padding: 5px; }
+.error-trace{ color: #f88; margin-left: 20px; font-size: 0.9em; white-space: pre-wrap; }
+#stage        { border: 1px dashed var(--archet-border, #555); padding: 10px; margin-top: 20px; opacity: 0.5; }
+#scratch      { display: none; }
+.visual-card  { margin: 6px 0 12px; }
+.visual-label { color: var(--archet-muted, #888); font-size: 0.85em; margin-bottom: 4px; }
+.visual-mount { padding: 10px; border: 1px solid var(--archet-border, #555); display: inline-block; }

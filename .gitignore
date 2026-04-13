@@ -1,12 +1,6 @@
+ref
 example
 claude-resume.sh
 
 # Deno
 .deno/
-
-# Playwright browser binaries
-/playwright-browsers/
-
-# OS
-.DS_Store
-Thumbs.db
