@@ -1,3 +1,45 @@
+// --- THEME SYSTEM ---
+(function() {
+  if (!document.documentElement.dataset.theme) {
+    document.documentElement.dataset.theme = "light";
+  }
+  if (document.getElementById("archet-theme-vars")) return;
+  const s = document.createElement("style");
+  s.id = "archet-theme-vars";
+  s.textContent = `
+    :root[data-theme="light"] {
+      --archet-bg:         #ffffff;
+      --archet-fg:         #1a1a1a;
+      --archet-border:     #cccccc;
+      --archet-surface:    #f0f0f0;
+      --archet-surface-alt:#f9f9f9;
+      --archet-link:       #005fcc;
+      --archet-focus:      #007bff;
+      --archet-focus-ring: rgba(0,123,255,0.25);
+      --archet-muted:      #888888;
+    }
+    :root[data-theme="dark"] {
+      --archet-bg:         #1e1e1e;
+      --archet-fg:         #e0e0e0;
+      --archet-border:     #444444;
+      --archet-surface:    #2d2d2d;
+      --archet-surface-alt:#252525;
+      --archet-link:       #4da6ff;
+      --archet-focus:      #4da6ff;
+      --archet-focus-ring: rgba(77,166,255,0.25);
+      --archet-muted:      #999999;
+    }
+    html[data-theme], html[data-theme] body {
+      background-color: var(--archet-bg);
+      color: var(--archet-fg);
+    }
+  `;
+  document.head.appendChild(s);
+}());
+
+export function setTheme(name) {
+  document.documentElement.dataset.theme = name;
+}
 /* archet - suckless web UI */
 /* More info: www.archet.ink */
 
@@ -72,7 +114,7 @@ export class Component {
   }
 
   // Visuals
-  bd(w=1, c="#ccc", s="solid") { return this.css({ border: `${w}px ${s} ${c}` }); }
+  bd(w=1, c="var(--archet-border)", s="solid") { return this.css({ border: `${w}px ${s} ${c}` }); }
   nobd() { return this.css({ border: "none" }); }
   round(px=4) { return this.css({ borderRadius: `${px}px` }); }
   pad(px) { return this.css({ padding: `${px}px` }); }
@@ -93,7 +135,9 @@ export class Component {
     .archet-button:active { transform: translateY(1px); }
     .archet-input input:focus,
     .archet-input textarea:focus,
-    .archet-select:focus { border-color: #007bff !important; box-shadow: 0 0 0 3px rgba(0,123,255,0.25); }
+    .archet-select:focus { border-color: var(--archet-focus, #007bff) !important; box-shadow: 0 0 0 3px var(--archet-focus-ring, rgba(0,123,255,0.25)); }
+    .archet-button.feedback-success { background: #28a745 !important; color: #fff !important; border-color: #28a745 !important; }
+    .archet-button.feedback-error   { background: #dc3545 !important; color: #fff !important; border-color: #dc3545 !important; }
   `;
   document.head.appendChild(s);
 })();
@@ -110,7 +154,7 @@ export class Root extends Component {
       s.textContent = `
         * { box-sizing: border-box; }
         button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
-          outline: 2px solid #005fcc; outline-offset: 2px;
+          outline: 2px solid var(--archet-focus, #005fcc); outline-offset: 2px;
         }
       `;
       document.head.appendChild(s);
@@ -209,12 +253,52 @@ export class Link extends Component {
     super("a");
     this.dom.textContent = lbl;
     this.attr("href", href);
-    this.css({ color:"#005fcc", textDecoration:"underline", cursor:"pointer" });
+    this.css({ color:"var(--archet-link, #005fcc)", textDecoration:"underline", cursor:"pointer" });
     if (href && href.startsWith("http")) this.attr("target", "_blank").attr("rel", "noopener noreferrer");
   }
 }
 
-// --- 8. IMAGE ---
+// --- 8. TABLE ---
+export class Table extends Component {
+  constructor(headers=[]) {
+    super("table");
+    this.cls("archet-table");
+    this.css({ borderCollapse:"collapse", width:"100%", fontFamily:"inherit" });
+
+    const thead = document.createElement("thead");
+    const tr    = document.createElement("tr");
+    headers.forEach(h => {
+      const th = document.createElement("th");
+      th.textContent = h;
+      th.style.cssText = "text-align:left;padding:8px 10px;border-bottom:2px solid var(--archet-border,#ccc);";
+      tr.appendChild(th);
+    });
+    thead.appendChild(tr);
+    this.dom.appendChild(thead);
+
+    this._tbody = document.createElement("tbody");
+    this.dom.appendChild(this._tbody);
+  }
+
+  addRow(cells=[]) {
+    const tr = document.createElement("tr");
+    cells.forEach(c => {
+      const td = document.createElement("td");
+      td.textContent = String(c);
+      td.style.cssText = "padding:8px 10px;border-bottom:1px solid var(--archet-border,#eee);";
+      tr.appendChild(td);
+    });
+    this._tbody.appendChild(tr);
+    return this;
+  }
+
+  clear() {
+    this._tbody.innerHTML = "";
+    return this;
+  }
+}
+
+// --- 9. IMAGE ---
 export class Image extends Component {
   constructor(src) {
     super("img");
@@ -235,7 +319,7 @@ export class Button extends Component {
 
     this.css({
       cursor:"pointer", display:"inline-flex", alignItems:"center", justifyContent:"center", gap:"8px",
-      border:"1px solid #ccc", background:"#eee", color:"inherit", fontSize: "inherit"
+      border:"1px solid var(--archet-border)", background:"var(--archet-surface)", color:"inherit", fontSize: "inherit"
     }).pad(10).round(4);
   }
 
@@ -309,7 +393,43 @@ export class FilePicker extends Component {
   trigger() { this.dom.click(); }
 }
 
-// --- 13. SELECT ---
+// --- 13. FORM ---
+export class Form extends Component {
+  constructor() {
+    super("div");
+    this.cls("archet-form");
+    this.css({ display:"flex", flexDirection:"column", gap:"10px" });
+    this._fields = {};
+  }
+
+  add(name, field) {
+    this._fields[name] = field;
+    super.add(field);
+    return this;
+  }
+
+  remove(name) {
+    if (!this._fields[name]) return this;
+    const field = this._fields[name];
+    const el = field.dom ?? field;
+    el.parentNode?.removeChild(el);
+    delete this._fields[name];
+    return this;
+  }
+
+  values() {
+    const out = {};
+    for (const [name, field] of Object.entries(this._fields)) out[name] = field.val;
+    return out;
+  }
+
+  clear() {
+    for (const field of Object.values(this._fields)) field.val = "";
+    return this;
+  }
+}
+
+// --- 14. SELECT ---
 export class Select extends Component {
   constructor(options=[]) {
     super("select");
@@ -385,7 +505,7 @@ export class Pager extends Component {
     this._pages = pages;
 
     this.nav = new Component("nav");
-    this.nav.css({ display:"flex", flexDirection:"column", gap:"4px", padding:"10px", borderRight:"1px solid #ccc", minWidth:"120px" });
+    this.nav.css({ display:"flex", flexDirection:"column", gap:"4px", padding:"10px", borderRight:"1px solid var(--archet-border,#ccc)", minWidth:"120px", overflowY:"auto" });
 
     this.content = new Box();
     this.content.css({ flex:"1", overflow:"auto" });
@@ -408,7 +528,7 @@ export class Pager extends Component {
     this._idx = i;
     this.content.dom.innerHTML = "";
     this.content.dom.appendChild(this._pages[i][1].dom);
-    this._links.forEach((l, j) => l.css({ background: j === i ? "#ddd" : "none", fontWeight: j === i ? "bold" : "normal" }));
+    this._links.forEach((l, j) => l.css({ background: j === i ? "var(--archet-surface,#ddd)" : "none", fontWeight: j === i ? "bold" : "normal" }));
     return this;
   }
 }
@@ -422,7 +542,7 @@ export class Tabber extends Component {
     this._pages = pages;
 
     this.strip = new Component("nav");
-    this.strip.css({ display:"flex", gap:"2px", borderBottom:"1px solid #ccc", padding:"0 10px" });
+    this.strip.css({ display:"flex", gap:"2px", borderBottom:"1px solid var(--archet-border,#ccc)", padding:"0 10px" });
 
     this.content = new Box();
     this.content.css({ flex:"1", overflow:"auto" });
@@ -460,7 +580,7 @@ export class NavPager extends Component {
 
     this.addBtn = new Button("+");
     this.nav = new Component("nav");
-    this.nav.css({ display:"flex", flexDirection:"column", gap:"4px", padding:"10px", borderRight:"1px solid #ccc", minWidth:"120px" });
+    this.nav.css({ display:"flex", flexDirection:"column", gap:"4px", padding:"10px", borderRight:"1px solid var(--archet-border,#ccc)", minWidth:"120px", overflowY:"auto" });
     this.nav.add(this.addBtn);
 
     this.content = new Box();
@@ -506,6 +626,7 @@ export class NavPager extends Component {
     this._idx = i;
     this.content.dom.innerHTML = "";
     this.content.dom.appendChild(this._pages[i].component.dom);
+    this._pages.forEach(({ entry }, j) => entry.css({ background: j === i ? "var(--archet-surface,#ddd)" : "none", fontWeight: j === i ? "bold" : "normal" }));
   }
 
   _remove(i) {
@@ -532,7 +653,7 @@ export class Crud extends Box {
     this.schema = schema; this.data = [];
     this.onError = alert;
 
-    this.bg("#fff").bd(1, "#ddd").round(8).pad(20).css({ maxWidth: "800px", margin: "20px auto" });
+    this.bg("var(--archet-bg,#fff)").bd(1, "var(--archet-border,#ddd)").round(8).pad(20).css({ maxWidth: "800px", margin: "20px auto" });
     this.add(new Text(title).css({ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "15px" }));
 
     const form = new Row().gap(10).css({ marginBottom: "20px" });
@@ -543,7 +664,7 @@ export class Crud extends Box {
     });
     this.add(form.add(new Button("Add", () => this.addItem()).bg("#28a745").fg("#fff").nobd()));
 
-    this.list = new Box().gap(5);
+    this.list = new Box().gap(5).css({ overflowY:"auto" });
     this.add(this.list);
   }
 
@@ -566,7 +687,7 @@ export class Crud extends Box {
   renderList() {
     this.list.dom.innerHTML = "";
     this.data.forEach((item, idx) => {
-      const row = new Row().bg("#f9f9f9").pad(10).round(4).bd(1, "#eee");
+      const row = new Row().bg("var(--archet-surface-alt,#f9f9f9)").pad(10).round(4).bd(1, "var(--archet-border,#eee)");
       this.schema.forEach(k => row.add(new Text(item[k]).css({ flex: 1 })));
 
       row.add(new Button("×", () => {
@@ -576,5 +697,210 @@ export class Crud extends Box {
 
       this.list.add(row);
     });
+  }
+}
+
+// --- 16. TOAST ---
+(function() {
+  if (document.getElementById("archet-toast-style")) return;
+  const s = document.createElement("style");
+  s.id = "archet-toast-style";
+  s.textContent = `
+    .archet-toast-success { background: #28a745; color: #fff; }
+    .archet-toast-error   { background: #dc3545; color: #fff; }
+  `;
+  document.head.appendChild(s);
+}());
+
+export class Toast extends Component {
+  constructor() {
+    super("div");
+    this.cls("archet-toast");
+    this.css({ display:"flex", flexDirection:"column", gap:"6px" });
+  }
+
+  _show(msg, cls, duration) {
+    const el = document.createElement("div");
+    el.className = cls;
+    el.textContent = msg;
+    el.style.cssText = "padding:10px 16px;border-radius:4px;font-family:inherit;";
+    this.dom.appendChild(el);
+    if (duration > 0) setTimeout(() => el.remove(), duration);
+    return this;
+  }
+
+  success(msg, duration=3000) { return this._show(msg, "archet-toast-success", duration); }
+  error(msg,   duration=3000) { return this._show(msg, "archet-toast-error",   duration); }
+}
+
+// --- 17. MODAL ---
+export class Modal extends Component {
+  constructor(title, content) {
+    super("div");
+    this.cls("archet-modal");
+    this.onClose = null;
+    this.css({ display:"none", position:"fixed", inset:"0", background:"rgba(0,0,0,0.5)", alignItems:"center", justifyContent:"center", zIndex:"1000" });
+
+    this._dialog = new Component("div");
+    this._dialog.css({ background:"var(--archet-bg,#fff)", borderRadius:"6px", padding:"24px", minWidth:"320px", maxWidth:"90vw", maxHeight:"90vh", overflow:"auto", position:"relative" });
+
+    const header = new Row().css({ justifyContent:"space-between", marginBottom:"16px" });
+    header.add(new Text(title).css({ fontWeight:"bold", fontSize:"1.1rem" }));
+    header.add(new Button("×", () => this.close()).nobd().bg("transparent").css({ fontSize:"1.2rem", lineHeight:"1" }));
+
+    this._dialog.add(header);
+    this._dialog.add(content);
+    super.add(this._dialog);
+
+    this.dom.addEventListener("click", (e) => { if (e.target === this.dom) this.close(); });
+  }
+
+  open()  { this.css({ display:"flex" }); return this; }
+  close() { this.css({ display:"none" }); if (this.onClose) this.onClose(); return this; }
+}
+
+// --- 18. SPINNER ---
+export class Spinner extends Component {
+  constructor(size=32) {
+    super("div");
+    this.cls("archet-spinner");
+    this.css({ width:`${size}px`, height:`${size}px`, border:"3px solid var(--archet-border,#ddd)", borderTopColor:"var(--archet-muted,#555)", borderRadius:"50%", display:"inline-block", animation:"archet-spin 0.7s linear infinite" });
+    if (!document.getElementById("archet-spinner-style")) {
+      const s = document.createElement("style");
+      s.id = "archet-spinner-style";
+      s.textContent = "@keyframes archet-spin { to { transform: rotate(360deg); } }";
+      document.head.appendChild(s);
+    }
+  }
+}
+
+// --- 19. ACCORDION ---
+export class Accordion extends Component {
+  constructor() {
+    super("div");
+    this.cls("archet-accordion");
+    this.css({ display:"flex", flexDirection:"column", width:"100%" });
+  }
+
+  add(label, content) {
+    const panel = new Component("div");
+    panel.css({ borderBottom:"1px solid var(--archet-border,#ddd)" });
+
+    const header = new Component("button");
+    header.attr("data-role", "panel-header");
+    header.add(label);
+    header.css({ width:"100%", textAlign:"left", background:"none", border:"none", padding:"10px 14px", cursor:"pointer", fontFamily:"inherit", fontSize:"inherit", fontWeight:"bold", color:"inherit" });
+
+    const body = new Component("div");
+    body.attr("data-role", "panel-body");
+    body.css({ display:"none", padding:"10px 14px" });
+    body.add(content);
+
+    header.on("click", () => {
+      const open = body.dom.style.display !== "none";
+      body.css({ display: open ? "none" : "block" });
+    });
+
+    panel.add(header);
+    panel.add(body);
+    super.add(panel);
+    return this;
+  }
+}
+
+// --- 20. CHECKLIST ---
+(function() {
+  if (document.getElementById("archet-checklist-style")) return;
+  const s = document.createElement("style");
+  s.id = "archet-checklist-style";
+  s.textContent = `
+    .archet-checklist input[type="checkbox"] {
+      appearance: none; -webkit-appearance: none;
+      width: 22px; height: 22px; min-width: 22px;
+      border: 2px solid var(--archet-border,#aaa); border-radius: 4px;
+      cursor: pointer; position: relative;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .archet-checklist input[type="checkbox"]:checked {
+      background: #28a745; border-color: #28a745;
+    }
+    .archet-checklist input[type="checkbox"]:checked::after {
+      content: ""; position: absolute;
+      left: 5px; top: 2px; width: 6px; height: 11px;
+      border: 2px solid #fff; border-top: none; border-left: none;
+      transform: rotate(45deg);
+    }
+  `;
+  document.head.appendChild(s);
+}());
+
+export class Checklist extends Component {
+  constructor() {
+    super("div");
+    this.cls("archet-checklist");
+    this.css({ display:"flex", flexDirection:"column", gap:"4px", overflowY:"auto" });
+    this.onComplete = null;
+
+    const row   = new Component("div");
+    row.css({ display:"flex", gap:"6px", padding:"4px 0" });
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.dataset.role = "item-input";
+    input.placeholder = "New item…";
+    input.style.cssText = "flex:1;padding:6px 8px;border:1px solid #ccc;border-radius:4px;font-family:inherit;font-size:inherit;";
+
+    const btn = document.createElement("button");
+    btn.dataset.role = "item-add";
+    btn.textContent = "+";
+    btn.style.cssText = "padding:6px 12px;border:none;border-radius:4px;background:#28a745;color:#fff;font-size:1.1rem;cursor:pointer;";
+
+    const doAdd = () => {
+      const label = input.value.trim();
+      if (!label) return;
+      this.add(label);
+      input.value = "";
+      input.focus();
+    };
+
+    btn.addEventListener("click", doAdd);
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") doAdd(); });
+
+    row.dom.appendChild(input);
+    row.dom.appendChild(btn);
+    super.add(row);
+  }
+
+  add(label) {
+    const item = new Component("div");
+    item.attr("data-role", "checklist-item");
+    item.css({ display:"flex", alignItems:"center", gap:"10px", padding:"6px 8px", borderRadius:"4px" });
+
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.dataset.role = "item-check";
+
+    const lbl = document.createElement("span");
+    lbl.textContent = label;
+    lbl.style.flex = "1";
+
+    const del = document.createElement("button");
+    del.dataset.role = "item-delete";
+    del.textContent = "×";
+    del.style.cssText = "border:none;cursor:pointer;color:#fff;background:#c00;font-size:1rem;padding:2px 8px;border-radius:4px;line-height:1.4;";
+
+    cb.addEventListener("change", () => {
+      lbl.style.textDecoration = cb.checked ? "line-through" : "";
+      lbl.style.opacity        = cb.checked ? "0.5" : "";
+      if (cb.checked && this.onComplete) this.onComplete(label);
+    });
+
+    del.addEventListener("click", () => item.dom.remove());
+
+    item.dom.appendChild(cb);
+    item.dom.appendChild(lbl);
+    item.dom.appendChild(del);
+    super.add(item);
+    return this;
   }
 }

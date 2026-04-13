@@ -6,6 +6,7 @@ strip() {
 }
 
 {
+  strip src/theme.js
   strip src/core.js
   strip src/layout.js
   strip src/content.js

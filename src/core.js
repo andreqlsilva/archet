@@ -72,7 +72,7 @@ export class Component {
   }
 
   // Visuals
-  bd(w=1, c="#ccc", s="solid") { return this.css({ border: `${w}px ${s} ${c}` }); }
+  bd(w=1, c="var(--archet-border)", s="solid") { return this.css({ border: `${w}px ${s} ${c}` }); }
   nobd() { return this.css({ border: "none" }); }
   round(px=4) { return this.css({ borderRadius: `${px}px` }); }
   pad(px) { return this.css({ padding: `${px}px` }); }
@@ -93,7 +93,9 @@ export class Component {
     .archet-button:active { transform: translateY(1px); }
     .archet-input input:focus,
     .archet-input textarea:focus,
-    .archet-select:focus { border-color: #007bff !important; box-shadow: 0 0 0 3px rgba(0,123,255,0.25); }
+    .archet-select:focus { border-color: var(--archet-focus, #007bff) !important; box-shadow: 0 0 0 3px var(--archet-focus-ring, rgba(0,123,255,0.25)); }
+    .archet-button.feedback-success { background: #28a745 !important; color: #fff !important; border-color: #28a745 !important; }
+    .archet-button.feedback-error   { background: #dc3545 !important; color: #fff !important; border-color: #dc3545 !important; }
   `;
   document.head.appendChild(s);
 })();
@@ -110,7 +112,7 @@ export class Root extends Component {
       s.textContent = `
         * { box-sizing: border-box; }
         button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
-          outline: 2px solid #005fcc; outline-offset: 2px;
+          outline: 2px solid var(--archet-focus, #005fcc); outline-offset: 2px;
         }
       `;
       document.head.appendChild(s);
