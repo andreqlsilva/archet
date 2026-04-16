@@ -10,4 +10,4 @@ h1          { border-bottom: 1px solid var(--archet-border, #555); padding-botto
 #scratch      { display: none; }
 .visual-card  { margin: 6px 0 12px; }
 .visual-label { color: var(--archet-muted, #888); font-size: 0.85em; margin-bottom: 4px; }
-.visual-mount { padding: 10px; border: 1px solid var(--archet-border, #555); display: inline-block; }
+.visual-mount { padding: 10px; border: 1px solid var(--archet-border, #555); display: inline-block; font-family: var(--archet-font, system-ui, sans-serif); }

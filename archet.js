@@ -7,6 +7,9 @@
   const s = document.createElement("style");
   s.id = "archet-theme-vars";
   s.textContent = `
+    :root {
+      --archet-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
     :root[data-theme="light"] {
       --archet-bg:         #ffffff;
       --archet-fg:         #1a1a1a;
@@ -153,6 +156,7 @@ export class Root extends Component {
       s.id = "archet-styles";
       s.textContent = `
         * { box-sizing: border-box; }
+        button, input, select, textarea { font-family: inherit; font-size: inherit; }
         button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
           outline: 2px solid var(--archet-focus, #005fcc); outline-offset: 2px;
         }
@@ -172,7 +176,7 @@ export class Root extends Component {
 
     if (target === document.body) {
       document.body.style.margin = "0";
-      document.body.style.fontFamily = 'system-ui, sans-serif';
+      document.body.style.fontFamily = 'var(--archet-font)';
     }
 
     target.appendChild(this.dom);

@@ -7,6 +7,9 @@
   const s = document.createElement("style");
   s.id = "archet-theme-vars";
   s.textContent = `
+    :root {
+      --archet-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
     :root[data-theme="light"] {
       --archet-bg:         #ffffff;
       --archet-fg:         #1a1a1a;
