@@ -11,11 +11,11 @@
       --archet-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
     :root[data-theme="light"] {
-      --archet-bg:         #ffffff;
+      --archet-bg:         #cccccc;
       --archet-fg:         #1a1a1a;
-      --archet-border:     #cccccc;
-      --archet-surface:    #f0f0f0;
-      --archet-surface-alt:#f9f9f9;
+      --archet-border:     #aaaaaa;
+      --archet-surface:    #bfbfbf;
+      --archet-surface-alt:#c5c5c5;
       --archet-link:       #005fcc;
       --archet-focus:      #007bff;
       --archet-focus-ring: rgba(0,123,255,0.25);
